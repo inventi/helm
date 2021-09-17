@@ -125,6 +125,7 @@ spec:
           {{ end }}
           ports:
             - containerPort: {{ .Values.service.internalPort }}
+              name: {{ .Values.service.name }}
           volumeMounts:
             {{- if .Values.logging.enabled}}
             - name: logging-config
