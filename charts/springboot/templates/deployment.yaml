@@ -77,6 +77,15 @@ spec:
         - name: {{ template "name" . }}
           image: "{{ .Values.global.image.repository }}/{{ .Values.image.name }}:{{ .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if .Values.command }}
+          command: [ "{{ .Values.command }}" ]
+          {{- end }}
+          {{- if .Values.args }}
+          args:
+            {{- range .Values.args }}
+            - {{ . | replace "%FULLNAME%" (include "fullname" $) | quote }}
+            {{- end }}
+          {{- end }}
           env:
             {{- if .Values.logging.enabled}}
             - name: LOGGING_CONFIG
@@ -116,6 +125,15 @@ spec:
           {{ end }}
           ports:
             - containerPort: {{ .Values.service.internalPort }}
+              name: {{ .Values.service.name }}
+            {{- if .Values.service.otherPorts }}
+            {{- range .Values.service.otherPorts }}
+            {{- if .containerPort }}
+            - containerPort: {{ if kindIs "bool" .containerPort }}{{ .targetPort }}{{ else }}{{ .containerPort }}{{ end }}
+              name: {{ .name }}
+            {{- end }}
+            {{- end }}
+            {{- end }}
           volumeMounts:
             {{- if .Values.logging.enabled}}
             - name: logging-config
