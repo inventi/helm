@@ -53,6 +53,8 @@ spec:
                 valueFrom:
                   secretKeyRef:
 {{ toYaml $envdef.secretKeyRef | indent 20 }}
+                {{- else if $envdef.tpl }}
+{{ tpl $envdef.tpl $ | indent 16 }}
                 {{- else }}
                 value: {{ required (printf "Value for variable cronJobs.%s.env.%s.value is undefined" $name $envname) $envdef.value | quote }}
                 {{- if $envdef.optional }}

@@ -115,6 +115,8 @@ spec:
               valueFrom:
                 secretKeyRef:
 {{ toYaml $definition.secretKeyRef | indent 18 }}
+              {{- else if $definition.tpl }}
+{{ tpl $definition.tpl $ | indent 14 }}
               {{- else }}
               value: {{ required (printf "Value for variable env.%s.value is undefined" $name) $definition.value | quote }}
               {{- if $definition.optional }}
