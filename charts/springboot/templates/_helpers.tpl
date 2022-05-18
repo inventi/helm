@@ -17,3 +17,37 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- define "secretname" -}}
 {{ template "fullname" . }}-secret
 {{- end -}}
+
+{{/*
+Process "env" structure
+*/}}
+{{- define "env_structure" -}}
+{{- if .env -}}
+  {{- $secretName := include "secretname" .root -}}
+  {{- range $name, $definition := .env }}
+- name: {{ $name | quote }}
+  {{- if $definition.sensitive }}
+  valueFrom:
+    secretKeyRef:
+      name: {{ $secretName | quote }}
+      key: {{ $definition.key | default $name | quote }}
+      {{- if $definition.optional }}
+      optional: true
+      {{- end }}
+  {{- else if $definition.configMapKeyRef }}
+  valueFrom:
+    configMapKeyRef:
+{{ toYaml $definition.configMapKeyRef | indent 6 }}
+  {{- else if $definition.secretKeyRef }}
+  valueFrom:
+    secretKeyRef:
+{{ toYaml $definition.secretKeyRef | indent 6 }}
+  {{- else }}
+  value: {{ required (printf "Value for variable env.%s.value is undefined" $name) $definition.value | quote }}
+  {{- if $definition.optional }}
+  optional: true
+  {{- end }}
+  {{- end }}
+  {{- end }}
+{{- end }}
+{{- end -}}

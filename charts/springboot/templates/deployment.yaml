@@ -95,34 +95,7 @@ spec:
             - name: TZ
               value: {{ .Values.timezone | quote }}
             {{- end }}
-          {{- if .Values.env -}}
-            {{- $secretName := include "secretname" . -}}
-            {{- range $name, $definition := .Values.env }}
-            - name: {{ $name | quote }}
-              {{- if $definition.sensitive }}
-              valueFrom:
-                secretKeyRef:
-                  name: {{ $secretName | quote }}
-                  key: {{ $definition.key | default $name | quote }}
-                  {{- if $definition.optional }}
-                  optional: true
-                  {{- end }}
-              {{- else if $definition.configMapKeyRef }}
-              valueFrom:
-                configMapKeyRef:
-{{ toYaml $definition.configMapKeyRef | indent 18 }}
-              {{- else if $definition.secretKeyRef }}
-              valueFrom:
-                secretKeyRef:
-{{ toYaml $definition.secretKeyRef | indent 18 }}
-              {{- else }}
-              value: {{ required (printf "Value for variable env.%s.value is undefined" $name) $definition.value | quote }}
-              {{- if $definition.optional }}
-              optional: true
-              {{- end }}
-              {{- end }}
-           {{- end }}
-          {{ end }}
+            {{- include "env_structure" (dict "root" $ "env" .Values.env) | indent 12 }}
           ports:
             - containerPort: {{ .Values.service.internalPort }}
               name: {{ .Values.service.name }}
