@@ -42,6 +42,14 @@ Process "env" structure
   valueFrom:
     secretKeyRef:
 {{ toYaml $definition.secretKeyRef | indent 6 }}
+  {{- else if $definition.fieldRef }}
+  valueFrom:
+    fieldRef:
+{{ toYaml $definition.fieldRef | indent 6 }}
+  {{- else if $definition.resourceFieldRef }}
+  valueFrom:
+    resourceFieldRef:
+{{ toYaml $definition.resourceFieldRef | indent 6 }}
   {{- else }}
   value: {{ required (printf "Value for variable env.%s.value is undefined" $name) $definition.value | quote }}
   {{- if $definition.optional }}
