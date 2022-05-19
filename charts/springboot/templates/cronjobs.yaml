@@ -34,7 +34,7 @@ spec:
             {{- end }}
             {{- if $definition.env }}
             env:
-            {{- include "env_structure" (dict "root" $ "env" $definition.env) | indent 12 }}
+            {{- include "env_structure" (dict "root" $ "values" $definition "key" "env") | indent 12 }}
             {{ end }}
           restartPolicy: Never
       backoffLimit: {{ $definition.backoffLimit }}

@@ -19,12 +19,35 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- end -}}
 
 {{/*
+Render structure toYaml or its Tpl if either is present
+*/}}
+{{- define "renderOptionalYamlOrTpl" -}}
+{{- $rawData := get .values .key }}
+{{- if not (empty .quote) }}
+{{- $rawData = $rawData | toString }}
+{{- end }}
+{{- $tplData := get .values (print .key "Tpl") }}
+{{- if $rawData }}
+{{- if empty .skipParent }}
+{{ .key }}:{{ printf "\n" }}
+{{- end }}
+{{- toYaml $rawData | indent (empty .skipParent | ternary 2 0) }}
+{{- else if $tplData }}
+{{- if empty .skipParent }}
+{{ .key }}:{{ printf "\n" }}
+{{- end }}
+{{- tpl $tplData .context | indent (empty .skipParent | ternary 2 0) }}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Process "env" structure
 */}}
 {{- define "env_structure" -}}
-{{- if .env -}}
-  {{- $secretName := include "secretname" .root -}}
-  {{- range $name, $definition := .env }}
+{{- $env := get .values .key -}}
+{{- if $env -}}
+  {{- $secretName := include "secretname" $.root -}}
+  {{- range $name, $definition := $env }}
 - name: {{ $name | quote }}
   {{- if $definition.sensitive }}
   valueFrom:
@@ -34,31 +57,30 @@ Process "env" structure
       {{- if $definition.optional }}
       optional: true
       {{- end }}
-  {{- else if $definition.configMapKeyRef }}
+  {{- else if or $definition.configMapKeyRef $definition.configMapKeyRefTpl }}
   valueFrom:
-    configMapKeyRef:
-{{ toYaml $definition.configMapKeyRef | indent 6 }}
-  {{- else if $definition.secretKeyRef }}
+{{- include "renderOptionalYamlOrTpl" (dict "context" $.root "values" $definition "key" "configMapKeyRef") | indent 4 }}
+  {{- else if or $definition.secretKeyRef $definition.secretKeyRefTpl }}
   valueFrom:
-    secretKeyRef:
-{{ toYaml $definition.secretKeyRef | indent 6 }}
-  {{- else if $definition.fieldRef }}
+{{- include "renderOptionalYamlOrTpl" (dict "context" $.root "values" $definition "key" "secretKeyRef") | indent 4 }}
+  {{- else if or $definition.fieldRef $definition.fieldRefTpl }}
   valueFrom:
-    fieldRef:
-{{ toYaml $definition.fieldRef | indent 6 }}
-  {{- else if $definition.resourceFieldRef }}
+{{- include "renderOptionalYamlOrTpl" (dict "context" $.root "values" $definition "key" "fieldRef") | indent 4 }}
+  {{- else if or $definition.resourceFieldRef $definition.resourceFieldRefTpl }}
   valueFrom:
-    resourceFieldRef:
-{{ toYaml $definition.resourceFieldRef | indent 6 }}
-  {{- else if $definition.valueFrom }}
-  valueFrom:
-{{ toYaml $definition.valueFrom | indent 4 }}
-  {{- else }}
-  value: {{ required (printf "Value for variable env.%s.value is undefined" $name) $definition.value | quote }}
+{{- include "renderOptionalYamlOrTpl" (dict "context" $.root "values" $definition "key" "resourceFieldRef") | indent 4 }}
+  {{- else if or $definition.valueFrom $definition.valueFromTpl }}
+{{- include "renderOptionalYamlOrTpl" (dict "context" $.root "values" $definition "key" "valueFrom") | indent 2 }}
+  {{- else if or $definition.value $definition.valueTpl }}
+  value: {{ include "renderOptionalYamlOrTpl" (dict "context" $.root "values" $definition "key" "value" "skipParent" true "quote" true) }}
   {{- if $definition.optional }}
   optional: true
   {{- end }}
+  {{- else }}
+  {{- fail (printf "Unable to render variable env.%s: unsupported method" $name) }}
   {{- end }}
   {{- end }}
-{{- end }}
+{{- else -}}
+{{- include "renderOptionalYamlOrTpl" (dict "context" .root "values" .values "key" .key "skipParent" true) }}
+{{- end -}}
 {{- end -}}

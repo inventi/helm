@@ -63,10 +63,7 @@ spec:
         {{- if .Values.fsGroup }}
         fsGroup: {{ .Values.fsGroup }}
         {{- end }}
-      {{ if .Values.initContainers }}
-      initContainers:
-{{ toYaml .Values.initContainers | indent 8 }}
-      {{ end }}
+      {{- include "renderOptionalYamlOrTpl" (dict "context" $ "values" .Values "key" "initContainers") | indent 6 }}
       {{- if .Values.serviceAccountName }}
       serviceAccountName: {{ .Values.serviceAccountName | quote }}
       {{- end }}
@@ -95,7 +92,7 @@ spec:
             - name: TZ
               value: {{ .Values.timezone | quote }}
             {{- end }}
-            {{- include "env_structure" (dict "root" $ "env" .Values.env) | indent 12 }}
+            {{- include "env_structure" (dict "root" $ "values" .Values "key" "env") | indent 12 }}
           ports:
             - containerPort: {{ .Values.service.internalPort }}
               name: {{ .Values.service.name }}
@@ -127,18 +124,9 @@ spec:
               {{- end }}
             {{- end }}
           {{- end }}
-          {{- if .Values.livenessProbe }}
-          livenessProbe:
-{{ toYaml .Values.livenessProbe | indent 12 }}
-          {{- end }}
-          {{- if .Values.readinessProbe }}
-          readinessProbe:
-{{ toYaml .Values.readinessProbe | indent 12 }}
-          {{- end }}
-          {{- if .Values.startupProbe }}
-          startupProbe:
-{{ toYaml .Values.startupProbe | indent 12 }}
-          {{- end }}
+          {{- include "renderOptionalYamlOrTpl" (dict "context" $ "values" .Values "key" "livenessProbe") | indent 10 }}
+          {{- include "renderOptionalYamlOrTpl" (dict "context" $ "values" .Values "key" "readinessProbe") | indent 10 }}
+          {{- include "renderOptionalYamlOrTpl" (dict "context" $ "values" .Values "key" "startupProbe") | indent 10 }}
           resources:
 {{ toYaml .Values.resources | indent 12 }}
       {{- if .Values.image.pullSecret }}
