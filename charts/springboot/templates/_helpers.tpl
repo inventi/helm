@@ -50,6 +50,9 @@ Process "env" structure
   valueFrom:
     resourceFieldRef:
 {{ toYaml $definition.resourceFieldRef | indent 6 }}
+  {{- else if $definition.valueFrom }}
+  valueFrom:
+{{ toYaml $definition.valueFrom | indent 4 }}
   {{- else }}
   value: {{ required (printf "Value for variable env.%s.value is undefined" $name) $definition.value | quote }}
   {{- if $definition.optional }}
