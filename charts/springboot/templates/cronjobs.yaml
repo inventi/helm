@@ -34,32 +34,7 @@ spec:
             {{- end }}
             {{- if $definition.env }}
             env:
-            {{- $secretName := include "secretname" $ -}}
-              {{- range $envname, $envdef := $definition.env }}
-              - name: {{ $envname | quote }}
-                {{- if $envdef.sensitive }}
-                valueFrom:
-                  secretKeyRef:
-                    name: {{ $secretName | quote }}
-                    key: {{ $envdef.key | default $envname | quote }}
-                    {{- if $envdef.optional }}
-                    optional: true
-                    {{- end }}
-                {{- else if $envdef.configMapKeyRef }}
-                valueFrom:
-                  configMapKeyRef:
-{{ toYaml $envdef.configMapKeyRef | indent 20 }}
-                {{- else if $envdef.secretKeyRef }}
-                valueFrom:
-                  secretKeyRef:
-{{ toYaml $envdef.secretKeyRef | indent 20 }}
-                {{- else }}
-                value: {{ required (printf "Value for variable cronJobs.%s.env.%s.value is undefined" $name $envname) $envdef.value | quote }}
-                {{- if $envdef.optional }}
-                optional: true
-                {{- end }}
-                {{- end }}
-              {{- end }}
+            {{- include "env_structure" (dict "root" $ "values" $definition "key" "env") | indent 12 }}
             {{ end }}
           restartPolicy: Never
       backoffLimit: {{ $definition.backoffLimit }}
