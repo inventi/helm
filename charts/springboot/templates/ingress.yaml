@@ -2,7 +2,7 @@
 {{- $serviceName := include "fullname" . -}}
 {{- $servicePort := .Values.service.externalPort -}}
 
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ template "fullname" . }}
@@ -26,9 +26,12 @@ spec:
         paths:
           {{- range $key := .Values.ingress.paths }}
           - path: {{$key}}
+            pathType: ImplementationSpecific
             backend:
-              serviceName: {{ $serviceName }}
-              servicePort: {{ $servicePort }}
+              service:
+                name: {{ $serviceName }}
+                port: 
+                  number: {{ $servicePort }}
           {{- end}}
 {{ if .Values.ingress.kong -}}
 ---
