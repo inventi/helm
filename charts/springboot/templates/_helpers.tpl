@@ -71,7 +71,7 @@ Process "env" structure
 {{- include "renderOptionalYamlOrTpl" (dict "context" $.root "values" $definition "key" "resourceFieldRef") | indent 4 }}
   {{- else if or $definition.valueFrom $definition.valueFromTpl }}
 {{- include "renderOptionalYamlOrTpl" (dict "context" $.root "values" $definition "key" "valueFrom") | indent 2 }}
-  {{- else if or $definition.value $definition.valueTpl }}
+  {{- else if or (hasKey $definition "value") (hasKey $definition "valueTpl") }}
   value: {{ include "renderOptionalYamlOrTpl" (dict "context" $.root "values" $definition "key" "value" "skipParent" true "quote" true) }}
   {{- if $definition.optional }}
   optional: true
