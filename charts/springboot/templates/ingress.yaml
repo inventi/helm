@@ -24,9 +24,9 @@ spec:
   rules:
     - http:
         paths:
-          {{- range $key := .Values.ingress.paths }}
-          - path: {{$key}}
-            pathType: ImplementationSpecific
+          {{- range $path := .Values.ingress.paths }}
+          - path: {{ if typeIs "string" $path }}{{ $path }}{{ else }}{{ $path.path }}{{ end }}
+            pathType: {{ if typeIs "string" $path }}ImplementationSpecific{{ else }}{{ $path.pathType | default "ImplementationSpecific" }}{{ end }}
             backend:
               service:
                 name: {{ $serviceName }}

@@ -26,9 +26,9 @@ spec:
   - host: {{ required "Required ingressExternal.hostname value not set" .Values.ingressExternal.hostname }}
     http:
       paths:
-        {{- range $key := .Values.ingressExternal.paths }}
-        - path: {{$key}}
-          pathType: ImplementationSpecific
+        {{- range $path := .Values.ingressExternal.paths }}
+        - path: {{ if typeIs "string" $path }}{{ $path }}{{ else }}{{ $path.path }}{{ end }}
+          pathType: {{ if typeIs "string" $path }}ImplementationSpecific{{ else }}{{ $path.pathType | default "ImplementationSpecific" }}{{ end }}
           backend:
               service:
                 name: {{ $serviceName }}
