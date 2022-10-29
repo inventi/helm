@@ -36,6 +36,9 @@ spec:
             env:
             {{- include "env_structure" (dict "root" $ "values" $definition "key" "env") | indent 12 }}
             {{ end }}
+            {{- if $definition.envFrom }}
+            envFrom: {{ toYaml $definition.envFrom | nindent 12 }}
+            {{- end }}
           restartPolicy: Never
       backoffLimit: {{ $definition.backoffLimit }}
       activeDeadlineSeconds: {{ $definition.activeDeadlineSeconds }}
