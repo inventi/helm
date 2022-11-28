@@ -1,6 +1,6 @@
 {{ range $name, $definition := .Values.cronJobs }}
 ---
-apiVersion: "batch/v1"
+apiVersion: {{ if $.Capabilities.APIVersions.Has "batch/v1" -}} batch/v1 {{- else -}} batch/v1beta1 {{- end }}
 kind: CronJob
 metadata:
   name: {{ template "fullname" $ }}-cron-{{ $name }}
