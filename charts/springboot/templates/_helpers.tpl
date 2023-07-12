@@ -22,20 +22,21 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 Render structure toYaml or its Tpl if either is present
 */}}
 {{- define "renderOptionalYamlOrTpl" -}}
-{{- $rawData := get .values .key }}
-{{- if not (empty .quote) }}
-{{- $rawData = $rawData | toString }}
-{{- end }}
-{{- $tplData := get .values (print .key "Tpl") }}
-{{- if $rawData }}
-{{- if empty .skipParent }}
-{{ .key }}:{{ printf "\n" }}
-{{- end }}
-{{- toYaml $rawData | indent (empty .skipParent | ternary 2 0) }}
-{{- else if $tplData }}
-{{- if empty .skipParent }}
-{{ .key }}:{{ printf "\n" }}
-{{- end }}
+{{- $rawData := get .values .key -}}
+{{- if not (empty .quote) -}}
+{{- $rawData = $rawData | toString -}}
+{{- end -}}
+{{- $tplData := get .values (print .key "Tpl") -}}
+{{- if $rawData -}}
+{{- $rawData := empty .skipParent | ternary (dict .key $rawData) $rawData -}}
+{{- if (empty .skipParent) -}}
+{{- printf "\n" -}}
+{{- end -}}
+{{- toYaml $rawData }}
+{{- else if $tplData -}}
+{{- if empty .skipParent -}}
+{{- printf "\n%s:\n" .key -}}
+{{- end -}}
 {{- tpl $tplData .context | indent (empty .skipParent | ternary 2 0) }}
 {{- end -}}
 {{- end -}}
