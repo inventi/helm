@@ -19,7 +19,8 @@ We truncate at 63 chars because some Kubernetes name fields are limited to this 
 {{- end -}}
 
 {{/*
-Render structure toYaml or its Tpl if either is present
+Render structure toYaml or its Tpl if either is present. It is highly advised
+to keep this function the same in the chart 'config'.
 */}}
 {{- define "renderOptionalYamlOrTpl" -}}
 {{- $rawData := get .values .key -}}
