@@ -1,4 +1,4 @@
-description: Configuration for springboot based services 
+description: Configuration for springboot based services
 engine: gotpl
 keywords:
 - springboot
@@ -9,4 +9,4 @@ maintainers:
 name: config
 sources:
 - https://github.com/inventi/helm
-version: 0.1.0
+version: 0.2.0
