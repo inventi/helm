@@ -7,5 +7,5 @@ metadata:
 data:
 {{- range $key, $value := .Values.config }}
   {{- $cmKeyName := (regexReplaceAllLiteral "Tpl$" $key "") -}}
-  {{- include "renderOptionalYamlOrTpl" (dict "context" $ "values" $.Values.config "key" $cmKeyName) | indent 2 }}
+  {{- include "renderOptionalYamlOrTpl" (dict "context" $ "values" $.Values.config "key" $cmKeyName) | indent 2 -}}
 {{ end }}
