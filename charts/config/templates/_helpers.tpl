@@ -27,9 +27,6 @@ to keep this function the same in the chart 'springboot'.
 {{- $tplData := get .values (print .key "Tpl") -}}
 {{- if $rawData -}}
 {{- $rawData := empty .skipParent | ternary (dict .key $rawData) $rawData -}}
-{{- if (empty .skipParent) -}}
-{{- printf "\n" -}}
-{{- end -}}
 {{- toYaml $rawData }}
 {{- else if $tplData -}}
 {{- if empty .skipParent -}}
