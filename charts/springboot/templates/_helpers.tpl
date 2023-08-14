@@ -30,9 +30,6 @@ to keep this function the same in the chart 'config'.
 {{- $tplData := get .values (print .key "Tpl") -}}
 {{- if $rawData -}}
 {{- $rawData := empty .skipParent | ternary (dict .key $rawData) $rawData -}}
-{{- if (empty .skipParent) -}}
-{{- printf "\n" -}}
-{{- end -}}
 {{- toYaml $rawData }}
 {{- else if $tplData -}}
 {{- if empty .skipParent -}}
@@ -61,18 +58,18 @@ Process "env" structure
       {{- end }}
   {{- else if or $definition.configMapKeyRef $definition.configMapKeyRefTpl }}
   valueFrom:
-{{- include "renderOptionalYamlOrTpl" (dict "context" $.root "values" $definition "key" "configMapKeyRef") | indent 4 }}
+    {{- include "renderOptionalYamlOrTpl" (dict "context" $.root "values" $definition "key" "configMapKeyRef") | nindent 4 }}
   {{- else if or $definition.secretKeyRef $definition.secretKeyRefTpl }}
   valueFrom:
-{{- include "renderOptionalYamlOrTpl" (dict "context" $.root "values" $definition "key" "secretKeyRef") | indent 4 }}
+    {{- include "renderOptionalYamlOrTpl" (dict "context" $.root "values" $definition "key" "secretKeyRef") | nindent 4 }}
   {{- else if or $definition.fieldRef $definition.fieldRefTpl }}
   valueFrom:
-{{- include "renderOptionalYamlOrTpl" (dict "context" $.root "values" $definition "key" "fieldRef") | indent 4 }}
+    {{- include "renderOptionalYamlOrTpl" (dict "context" $.root "values" $definition "key" "fieldRef") | nindent 4 }}
   {{- else if or $definition.resourceFieldRef $definition.resourceFieldRefTpl }}
   valueFrom:
-{{- include "renderOptionalYamlOrTpl" (dict "context" $.root "values" $definition "key" "resourceFieldRef") | indent 4 }}
+    {{- include "renderOptionalYamlOrTpl" (dict "context" $.root "values" $definition "key" "resourceFieldRef") | nindent 4 }}
   {{- else if or $definition.valueFrom $definition.valueFromTpl }}
-{{- include "renderOptionalYamlOrTpl" (dict "context" $.root "values" $definition "key" "valueFrom") | indent 2 }}
+    {{- include "renderOptionalYamlOrTpl" (dict "context" $.root "values" $definition "key" "valueFrom") | nindent 2 }}
   {{- else if or (hasKey $definition "value") (hasKey $definition "valueTpl") }}
   value: {{ include "renderOptionalYamlOrTpl" (dict "context" $.root "values" $definition "key" "value" "skipParent" true "quote" true) }}
   {{- if $definition.optional }}
