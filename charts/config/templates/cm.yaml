@@ -5,7 +5,7 @@ metadata:
   labels:
     app: {{ .Release.Name }}
 data:
-{{- range $key, $value := .Values.config }}
+{{- range $key, $value := .Values.config -}}
   {{- $cmKeyName := (regexReplaceAllLiteral "Tpl$" $key "") -}}
-  {{- include "renderOptionalYamlOrTpl" (dict "context" $ "values" $.Values.config "key" $cmKeyName) | indent 2 }}
-{{ end }}
+  {{- include "renderOptionalYamlOrTpl" (dict "context" $ "values" $.Values.config "key" $cmKeyName) | nindent 2 -}}
+{{- end -}}
