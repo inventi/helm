@@ -58,6 +58,18 @@ spec:
                     app: {{ template "name" . }}
                     release: {{ .Release.Name | quote }}
       {{- end }}
+      {{- if .Values.topologySpreadConstraints }}
+      topologySpreadConstraints: {{ toYaml .Values.topologySpreadConstraints | nindent 8 }}
+      {{- else if eq .Values.topologySpreadConstraint "zone" }}
+      topologySpreadConstraints:
+        - labelSelector:
+            matchLabels:
+              app: {{ template "name" . }}
+              release: {{ .Release.Name | quote }}
+          maxSkew: 1
+          topologyKey: "topology.kubernetes.io/zone"
+          whenUnsatisfiable: "DoNotSchedule"
+      {{- end }}
       securityContext:
         runAsUser: {{ required "podUID must be specified!" .Values.podUID }}
         {{- if .Values.fsGroup }}
