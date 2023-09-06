@@ -141,7 +141,7 @@ spec:
           {{- end }}
           {{- include "renderOptionalYamlOrTpl" (dict "context" $ "values" .Values "key" "livenessProbe") | nindent 10 -}}
           {{- include "renderOptionalYamlOrTpl" (dict "context" $ "values" .Values "key" "readinessProbe") | nindent 10 -}}
-          {{- include "renderOptionalYamlOrTpl" (dict "context" $ "values" .Values "key" "startupProbe") | nindent 10 -}}
+          {{- include "renderOptionalYamlOrTpl" (dict "context" $ "values" .Values "key" "startupProbe") | nindent 10 }}
           resources:
 {{ toYaml .Values.resources | indent 12 }}
       {{- if .Values.image.pullSecret }}
