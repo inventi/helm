@@ -139,9 +139,9 @@ spec:
               {{- end }}
             {{- end }}
           {{- end }}
-          {{- include "renderOptionalYamlOrTpl" (dict "context" $ "values" .Values "key" "livenessProbe") | nindent 10 -}}
-          {{- include "renderOptionalYamlOrTpl" (dict "context" $ "values" .Values "key" "readinessProbe") | nindent 10 -}}
-          {{- include "renderOptionalYamlOrTpl" (dict "context" $ "values" .Values "key" "startupProbe") | nindent 10 }}
+          {{- include "renderOptionalYamlOrTpl" (dict "context" $ "values" .Values "key" "livenessProbe") | nindent 10 | trimSuffix (nindent 10 "") }}
+          {{- include "renderOptionalYamlOrTpl" (dict "context" $ "values" .Values "key" "readinessProbe") | nindent 10 | trimSuffix (nindent 10 "") }}
+          {{- include "renderOptionalYamlOrTpl" (dict "context" $ "values" .Values "key" "startupProbe") | nindent 10 | trimSuffix (nindent 10 "") }}
           resources:
 {{ toYaml .Values.resources | indent 12 }}
         {{- include "renderOptionalYamlOrTpl" (dict "context" $ "values" .Values "key" "additionalContainers" "skipParent" true) | nindent 8 | trimSuffix (nindent 8 "") }}
